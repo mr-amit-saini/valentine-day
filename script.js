@@ -47,14 +47,14 @@ const yesBtn = document.getElementById('yes-btn');
 const noBtn = document.getElementById('no-btn');
 const music = document.getElementById('bg-music');
 
-/* ---------- MUSIC AUTOPLAY ---------- */
+// Autoplay: start muted (bypasses browser policy), then unmute if allowed
 if (music) {
   music.muted = true;
   music.volume = 0.3;
-
   music.play().then(() => {
     music.muted = false;
   }).catch(() => {
+    // Fallback: unmute on first interaction
     document.addEventListener('click', () => {
       music.muted = false;
       music.play().catch(() => {});
@@ -64,6 +64,7 @@ if (music) {
 
 function toggleMusic() {
   if (!music) return;
+
   const toggleEl = document.getElementById('music-toggle');
 
   if (musicPlaying) {
@@ -78,7 +79,17 @@ function toggleMusic() {
   }
 }
 
-/* ---------- TOAST ---------- */
+function handleYesClick() {
+  if (!runawayEnabled) {
+    // Tease her to try No first
+    const msg = yesTeasePokes[Math.min(yesTeasedCount, yesTeasePokes.length - 1)];
+    yesTeasedCount++;
+    showTeaseMessage(msg);
+    return;
+  }
+  window.location.href = 'yes.html';
+}
+
 function showTeaseMessage(msg) {
   const toast = document.getElementById('tease-toast');
   if (!toast) return;
@@ -89,61 +100,43 @@ function showTeaseMessage(msg) {
   toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
-/* ---------- YES CLICK ---------- */
-/* Shows ALL yesTeasePokes (one per click), then redirects */
-function handleYesClick() {
-  // show teases until we exhaust the array
-  if (yesTeasedCount < yesTeasePokes.length) {
-    showTeaseMessage(yesTeasePokes[yesTeasedCount]);
-    yesTeasedCount++;
-    return;
-  }
-
-  // after last tease, go to yes page
-  window.location.href = 'yes.html';
-}
-
-/* ---------- NO CLICK ---------- */
-/* Shows ALL noMessages in order, guaranteed (runaway only AFTER all are shown) */
 function handleNoClick() {
   noClickCount++;
 
-  // show all messages from index 0 onward
+  // ✅ FIX: show ALL noMessages starting from index 0
   const msgIndex = Math.min(noClickCount - 1, noMessages.length - 1);
   noBtn.textContent = noMessages[msgIndex];
 
-  // grow yes button each time (kept your behavior)
+  // Grow the Yes button bigger each time
   const currentSize = parseFloat(window.getComputedStyle(yesBtn).fontSize);
-  yesBtn.style.fontSize = `${currentSize * 1.25}px`;
+  yesBtn.style.fontSize = `${currentSize * 1.35}px`;
 
-  const padY = Math.min(18 + noClickCount * 4, 60);
-  const padX = Math.min(45 + noClickCount * 8, 120);
+  const padY = Math.min(18 + noClickCount * 5, 60);
+  const padX = Math.min(45 + noClickCount * 10, 120);
   yesBtn.style.padding = `${padY}px ${padX}px`;
 
-  // shrink no button slightly after a couple clicks
+  // Shrink No button to contrast
   if (noClickCount >= 2) {
     const noSize = parseFloat(window.getComputedStyle(noBtn).fontSize);
-    noBtn.style.fontSize = `${Math.max(noSize * 0.9, 10)}px`;
+    noBtn.style.fontSize = `${Math.max(noSize * 0.85, 10)}px`;
   }
 
-  // gif stage follows noClickCount (clamped)
+  // ✅ FIX: show ALL gifStages starting from index 0
   if (catGif) {
     const gifIndex = Math.min(noClickCount - 1, gifStages.length - 1);
     swapGif(gifStages[gifIndex]);
   }
 
-  // ✅ Runaway starts ONLY after you've shown ALL noMessages
-  if (noClickCount >= noMessages.length && !runawayEnabled) {
+  // Runaway starts at click 8
+  if (noClickCount >= 8 && !runawayEnabled) {
     enableRunaway();
     runawayEnabled = true;
-
-    // optional: a toast so she knows why it changed
-    showTeaseMessage("Okay okay—now you have to catch the 'No' 😜");
   }
 }
 
 function swapGif(src) {
   if (!catGif) return;
+
   catGif.style.opacity = '0';
   setTimeout(() => {
     catGif.src = src;
@@ -151,7 +144,6 @@ function swapGif(src) {
   }, 200);
 }
 
-/* ---------- RUNAWAY ---------- */
 function enableRunaway() {
   noBtn.addEventListener('mouseover', runAway);
   noBtn.addEventListener('touchstart', runAway, { passive: true });
@@ -174,9 +166,9 @@ function runAway() {
   noBtn.style.zIndex = '50';
 }
 
-/* ---------- ATTACH HANDLERS ---------- */
+// Attach handlers (in case your HTML uses addEventListener instead of inline onclick)
 if (yesBtn) yesBtn.addEventListener('click', handleYesClick);
 if (noBtn) noBtn.addEventListener('click', handleNoClick);
 
-// expose toggleMusic if you call it inline in HTML
+// If your HTML uses inline onclick="toggleMusic()", expose it:
 window.toggleMusic = toggleMusic;
