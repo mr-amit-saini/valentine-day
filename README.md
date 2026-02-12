@@ -14,9 +14,7 @@ You've got three options — pick whatever works for you.
 
 No setup needed. Just send this link:
 
-```
-[https://mr-amit-saini.github.io/valentine-day](https://mr-amit-saini.github.io/valentine-day/)
-```
+https://mr-amit-saini.github.io/valentine-day/
 
 That's it. Done. You're welcome.
 
