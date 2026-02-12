@@ -7,7 +7,8 @@ const gifStages = [
   "https://media1.tenor.com/m/WGfra-Y_Ke0AAAAd/chiikawa-sad.gif",         // 5 sadder
   "https://media.tenor.com/CivArbX7NzQAAAAj/somsom1012.gif",              // 6 devastated
   "https://media.tenor.com/5_tv1HquZlcAAAAj/chiikawa.gif",                // 7 very devastated
-  "https://media1.tenor.com/m/uDugCXK4vI4AAAAC/chiikawa-hachiware.gif"    // 8 crying runaway
+  "https://media1.tenor.com/m/uDugCXK4vI4AAAAC/chiikawa-hachiware.gif",    // 8 crying runaway
+  "https://media.tenor.com/-IftKx6q-BQAAAAj/chiikawa.gif"
 ];
 
 const noMessages = [
